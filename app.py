@@ -28,7 +28,7 @@ from sklearn.cluster import KMeans
 # Page Config
 # =========================
 st.set_page_config(
-    page_title="CareFinder",
+    page_title="MediScope",
     page_icon="🏥",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -309,6 +309,61 @@ hr {
     background: #d7ebe5;
     margin: 20px 0;
 }
+
+/* ===== PROFESSIONAL CENTERED TABS ===== */
+div[data-testid="stTabs"] {
+    width: 100%;
+}
+
+div[data-testid="stTabs"] div[role="tablist"] {
+    justify-content: center !important;
+    gap: 18px !important;
+    border-bottom: 1px solid rgba(8, 120, 95, 0.18);
+    padding-bottom: 12px;
+}
+
+div[data-testid="stTabs"] button[role="tab"] {
+    border-radius: 999px !important;
+    padding: 10px 22px !important;
+    min-width: 150px;
+    background: rgba(255, 255, 255, 0.10) !important;
+    border: 1px solid rgba(8, 120, 95, 0.18) !important;
+}
+
+div[data-testid="stTabs"] button[role="tab"] p {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    margin: 0 !important;
+}
+
+div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
+    background: linear-gradient(90deg, #08785f, #12b98d) !important;
+    border: 1px solid transparent !important;
+    box-shadow: 0 10px 24px rgba(8, 120, 95, 0.25);
+}
+
+div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] p {
+    color: white !important;
+}
+
+/* ===== DASHBOARD METRIC CARDS ===== */
+[data-testid="stMetric"] {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(8, 120, 95, 0.13);
+    border-radius: 22px;
+    padding: 22px 24px;
+    box-shadow: 0 12px 28px rgba(19, 48, 43, 0.08);
+}
+
+[data-testid="stMetricLabel"] {
+    font-size: 16px !important;
+}
+
+[data-testid="stMetricValue"] {
+    font-size: 34px !important;
+    font-weight: 900 !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -319,8 +374,8 @@ hr {
 def login_page():
     st.markdown("""
     <div class="main-title">
-        <h1>CareFinder</h1>
-        <p>Hospital Document Management System</p>
+        <h1>MediScope</h1>
+        <p>Smart Hospital Document Intelligence System</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -361,15 +416,15 @@ if not st.session_state.logged_in:
 # =========================
 st.markdown("""
 <div class="main-title">
-    <h1>CareFinder</h1>
-    <p>Hospital Document Retrieval, Classification & Clustering System</p>
+    <h1>MediScope</h1>
+    <p>Smart Hospital Document Intelligence System</p>
 </div>
 """, unsafe_allow_html=True)
 
 with st.sidebar:
     st.markdown("---")
-    st.markdown("## 🏥 CareFinder")
-    st.markdown("Hospital Recommendation GUI")
+    st.markdown("## 🏥 MediScope")
+    st.markdown("Document Intelligence GUI")
     if st.button("Logout"):
         st.session_state.logged_in = False
         st.rerun()
@@ -480,18 +535,18 @@ home_tab, retrieval_tab, classification_tab, clustering_tab = st.tabs(
 with home_tab:
     st.markdown("""
     <div class="hero-card">
-        <h2>Welcome to CareFinder</h2>
+        <h2>Welcome to MediScope</h2>
         <p>
-            A smart hospital document system that helps users retrieve similar documents,
-            classify recommendations, and discover document groups using NLP and machine learning.
+            A professional hospital document intelligence system for semantic retrieval,
+            recommendation classification, and document clustering using NLP and machine learning.
         </p>
     </div>
     """, unsafe_allow_html=True)
 
     m1, m2, m3 = st.columns(3)
-    m1.metric("Documents", len(Data))
-    m2.metric("Main Tasks", "3")
-    m3.metric("Model Type", "NLP")
+    m1.metric("📄 Total Documents", len(Data))
+    m2.metric("⚙️ System Functions", "3 Tools")
+    m3.metric("🧠 AI Technique", "NLP")
 
     st.markdown("<br>", unsafe_allow_html=True)
 
