@@ -30,31 +30,140 @@ from sklearn.cluster import KMeans
 st.set_page_config(
     page_title="CareFinder",
     page_icon="🏥",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 
 # =========================
-# Custom CSS
+# Session State
 # =========================
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+if "theme" not in st.session_state:
+    st.session_state.theme = "Light"
+
+
+# =========================
+# Sidebar Theme
+# =========================
+with st.sidebar:
+    st.markdown("## ⚙️ Settings")
+    st.session_state.theme = st.radio(
+        "Theme",
+        ["Light", "Dark"],
+        horizontal=True
+    )
+
+
+# =========================
+# CSS Themes
+# =========================
+if st.session_state.theme == "Dark":
+    css = """
+    <style>
+    .stApp {
+        background: linear-gradient(135deg, #071f1b 0%, #0b2b25 45%, #101418 100%);
+        color: #f5f7f7;
+    }
+
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #06251f 0%, #0b5c4a 100%);
+    }
+
+    [data-testid="stSidebar"] * {
+        color: white !important;
+    }
+
+    .main-title h1, .section-title, .feature-card h3 {
+        color: #38d9ad !important;
+    }
+
+    .main-title p, .small-muted, .feature-card p, .hero-card p {
+        color: #d0d8d6 !important;
+    }
+
+    .hero-card, .feature-card, .section-card, .login-card {
+        background: rgba(15, 35, 32, 0.96);
+        border: 1px solid rgba(70, 220, 180, 0.18);
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+        color: #f5f7f7;
+    }
+
+    div.stButton > button {
+        background: linear-gradient(90deg, #0e8d71, #28c99c);
+        color: white;
+        border: none;
+        border-radius: 999px;
+        padding: 0.7rem 1.5rem;
+        font-weight: 700;
+    }
+
+    [data-testid="stMetricValue"] {
+        color: #38d9ad;
+    }
+    </style>
+    """
+else:
+    css = """
+    <style>
+    .stApp {
+        background: linear-gradient(135deg, #eef7f5 0%, #f8fbff 45%, #ffffff 100%);
+        color: #1c2529;
+    }
+
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0b6b57 0%, #0f8f70 100%);
+    }
+
+    [data-testid="stSidebar"] * {
+        color: white !important;
+    }
+
+    .main-title h1, .section-title, .feature-card h3 {
+        color: #08785f !important;
+    }
+
+    .main-title p, .small-muted, .feature-card p, .hero-card p {
+        color: #5b6670 !important;
+    }
+
+    .hero-card {
+        background: linear-gradient(120deg, #d9f3dd, #f5fff7);
+        border: 1px solid #c6e8cf;
+        box-shadow: 0 18px 45px rgba(15, 143, 112, 0.15);
+    }
+
+    .feature-card, .section-card, .login-card {
+        background: white;
+        border: 1px solid #e8eeee;
+        box-shadow: 0 12px 32px rgba(19, 48, 43, 0.08);
+    }
+
+    div.stButton > button {
+        background: linear-gradient(90deg, #08785f, #11a87f);
+        color: white;
+        border: none;
+        border-radius: 999px;
+        padding: 0.7rem 1.5rem;
+        font-weight: 700;
+    }
+
+    [data-testid="stMetricValue"] {
+        color: #08785f;
+    }
+    </style>
+    """
+
+st.markdown(css, unsafe_allow_html=True)
+
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
 html, body, [class*="css"] {
     font-family: 'Inter', sans-serif;
-}
-
-.stApp {
-    background: linear-gradient(135deg, #eef7f5 0%, #f8fbff 45%, #ffffff 100%);
-}
-
-[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0b6b57 0%, #0f8f70 100%);
-}
-
-[data-testid="stSidebar"] * {
-    color: white !important;
 }
 
 .main-title {
@@ -65,22 +174,17 @@ html, body, [class*="css"] {
 .main-title h1 {
     font-size: 58px;
     font-weight: 800;
-    color: #08785f;
     margin-bottom: 0;
 }
 
 .main-title p {
     font-size: 18px;
-    color: #5b6670;
     margin-top: 6px;
 }
 
 .hero-card {
-    background: linear-gradient(120deg, #d9f3dd, #f5fff7);
-    border: 1px solid #c6e8cf;
     border-radius: 28px;
     padding: 34px;
-    box-shadow: 0 18px 45px rgba(15, 143, 112, 0.15);
     text-align: center;
     margin-bottom: 22px;
 }
@@ -92,72 +196,55 @@ html, body, [class*="css"] {
     margin-bottom: 4px;
 }
 
-.hero-card p {
-    color: #50626b;
-    font-size: 17px;
-}
-
 .feature-card {
-    background: white;
     border-radius: 22px;
     padding: 24px;
     min-height: 190px;
-    border: 1px solid #e8eeee;
-    box-shadow: 0 10px 28px rgba(19, 48, 43, 0.08);
     transition: all 0.2s ease;
 }
 
 .feature-card h3 {
-    color: #08785f;
     font-weight: 800;
     font-size: 22px;
 }
 
 .feature-card p {
-    color: #5e6b73;
     font-size: 15px;
     line-height: 1.6;
 }
 
-.section-card {
-    background: white;
+.section-card, .login-card {
     border-radius: 24px;
     padding: 28px;
-    border: 1px solid #e8eeee;
-    box-shadow: 0 12px 32px rgba(19, 48, 43, 0.08);
     margin-bottom: 22px;
 }
 
 .section-title {
-    color: #08785f;
     font-weight: 800;
     font-size: 28px;
     margin-bottom: 8px;
 }
 
 .small-muted {
-    color: #65737b;
     font-size: 15px;
 }
 
-div.stButton > button {
-    background: linear-gradient(90deg, #08785f, #11a87f);
-    color: white;
-    border: none;
-    border-radius: 999px;
-    padding: 0.7rem 1.5rem;
-    font-weight: 700;
-    box-shadow: 0 10px 20px rgba(8, 120, 95, 0.22);
+.login-title {
+    text-align: center;
+    font-size: 42px;
+    font-weight: 800;
+    color: #08785f;
+}
+
+.login-subtitle {
+    text-align: center;
+    color: #6a777d;
+    margin-bottom: 25px;
 }
 
 div.stButton > button:hover {
-    background: linear-gradient(90deg, #076b55, #0e906d);
+    filter: brightness(0.95);
     color: white;
-}
-
-[data-testid="stMetricValue"] {
-    color: #08785f;
-    font-weight: 800;
 }
 
 hr {
@@ -171,6 +258,49 @@ hr {
 
 
 # =========================
+# Login Page
+# =========================
+def login_page():
+    st.markdown("""
+    <div class="main-title">
+        <h1>CareFinder</h1>
+        <p>Hospital Document Management System</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    left, center, right = st.columns([1, 1.2, 1])
+
+    with center:
+        st.markdown("""
+        <div class="login-card">
+            <div class="login-title">Login</div>
+            <div class="login-subtitle">Enter your username and password to access the system</div>
+        """, unsafe_allow_html=True)
+
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+
+        login_clicked = st.button("Login", use_container_width=True)
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        if login_clicked:
+            if username == "admin" and password == "1234":
+                st.session_state.logged_in = True
+                st.success("Login successful")
+                st.rerun()
+            else:
+                st.error("Wrong username or password")
+
+        st.info("Default login: username = admin | password = 1234")
+
+
+if not st.session_state.logged_in:
+    login_page()
+    st.stop()
+
+
+# =========================
 # Header
 # =========================
 st.markdown("""
@@ -179,6 +309,14 @@ st.markdown("""
     <p>Hospital Document Retrieval, Classification & Clustering System</p>
 </div>
 """, unsafe_allow_html=True)
+
+with st.sidebar:
+    st.markdown("---")
+    st.markdown("## 🏥 CareFinder")
+    st.markdown("Hospital Recommendation GUI")
+    if st.button("Logout"):
+        st.session_state.logged_in = False
+        st.rerun()
 
 
 # =========================
@@ -245,13 +383,10 @@ def load_documents(data_path):
 
 
 # =========================
-# Sidebar
+# Data
 # =========================
-st.sidebar.markdown("## 🏥 CareFinder")
-st.sidebar.markdown("Hospital Recommendation GUI")
-st.sidebar.markdown("---")
-
-uploaded_file = st.sidebar.file_uploader("Optional: Upload Data.zip", type="zip")
+with st.sidebar:
+    uploaded_file = st.file_uploader("Optional: Upload Data.zip", type="zip")
 
 if uploaded_file is not None:
     data_path = extract_uploaded_zip(uploaded_file)
@@ -289,13 +424,20 @@ home_tab, retrieval_tab, classification_tab, clustering_tab = st.tabs(
 with home_tab:
     st.markdown("""
     <div class="hero-card">
-        <h2>Find the Best Hospital Reviews Easily</h2>
+        <h2>Welcome to CareFinder</h2>
         <p>
-            Search similar hospital documents, classify recommendations, and group documents
-            using NLP and machine learning techniques.
+            A smart hospital document system that helps users retrieve similar documents,
+            classify recommendations, and discover document groups using NLP and machine learning.
         </p>
     </div>
     """, unsafe_allow_html=True)
+
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Documents", len(Data))
+    m2.metric("Main Tasks", "3")
+    m3.metric("Model Type", "NLP")
+
+    st.markdown("<br>", unsafe_allow_html=True)
 
     c1, c2, c3 = st.columns(3)
 
