@@ -46,15 +46,16 @@ if "theme" not in st.session_state:
 
 
 # =========================
-# Sidebar Theme
+# Theme Toggle
 # =========================
+top_left, top_right = st.columns([5, 1])
+with top_right:
+    st.session_state.theme = st.toggle("🌙 Dark Mode", value=(st.session_state.theme == "Dark"))
+    st.session_state.theme = "Dark" if st.session_state.theme else "Light"
+
 with st.sidebar:
     st.markdown("## ⚙️ Settings")
-    st.session_state.theme = st.radio(
-        "Theme",
-        ["Light", "Dark"],
-        horizontal=True
-    )
+    st.write("Use the switch at the top-right to change theme.")
 
 
 # =========================
@@ -103,6 +104,29 @@ if st.session_state.theme == "Dark":
     [data-testid="stMetricValue"] {
         color: #38d9ad;
     }
+    
+/* ===== DARK MODE VISIBILITY ===== */
+div[data-testid="stTabs"] button, div[data-testid="stTabs"] button p {
+    color: #d8fff5 !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
+}
+div[data-testid="stTabs"] [aria-selected="true"], div[data-testid="stTabs"] [aria-selected="true"] p {
+    color: #38d9ad !important;
+}
+[data-testid="stMetricLabel"] {
+    color: #d8fff5 !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
+}
+[data-testid="stMetricValue"] {
+    color: #38d9ad !important;
+}
+label, .stRadio label, .stTextInput label, .stSlider label {
+    color: #d8fff5 !important;
+    font-weight: 700 !important;
+}
+
     </style>
     """
 else:
@@ -153,6 +177,38 @@ else:
     [data-testid="stMetricValue"] {
         color: #08785f;
     }
+    
+/* ===== FIX VISIBILITY ===== */
+div[data-testid="stTabs"] button {
+    color: #08785f !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
+}
+div[data-testid="stTabs"] button p {
+    color: #08785f !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
+}
+div[data-testid="stTabs"] [aria-selected="true"] {
+    color: #ff4b4b !important;
+    border-bottom: 3px solid #ff4b4b !important;
+}
+div[data-testid="stTabs"] [aria-selected="true"] p {
+    color: #ff4b4b !important;
+}
+[data-testid="stMetricLabel"] {
+    color: #08785f !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
+}
+[data-testid="stMetricValue"] {
+    color: #08785f !important;
+}
+label, .stRadio label, .stTextInput label, .stSlider label {
+    color: #08785f !important;
+    font-weight: 700 !important;
+}
+
     </style>
     """
 
