@@ -29,7 +29,7 @@ from sklearn.cluster import KMeans
 # =========================
 st.set_page_config(
     page_title="MediScope",
-    page_icon="🏥",
+    page_icon="🔬",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -364,6 +364,94 @@ div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] p {
     font-weight: 900 !important;
 }
 
+
+/* ===== MEDISCOPE LOGO ===== */
+.brand-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    padding: 24px 16px 8px 16px;
+}
+
+.logo-mark {
+    width: 82px;
+    height: 82px;
+    border-radius: 26px;
+    background: linear-gradient(135deg, #08785f, #13c99a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 18px 38px rgba(8, 120, 95, 0.28);
+    position: relative;
+}
+
+.logo-mark::before {
+    content: "✚";
+    color: white;
+    font-size: 34px;
+    font-weight: 900;
+    position: absolute;
+    top: 14px;
+    left: 18px;
+}
+
+.logo-mark::after {
+    content: "⌕";
+    color: rgba(255,255,255,0.92);
+    font-size: 42px;
+    font-weight: 900;
+    position: absolute;
+    right: 12px;
+    bottom: 5px;
+    transform: rotate(-12deg);
+}
+
+.brand-text h1 {
+    font-size: 58px;
+    font-weight: 900;
+    margin: 0;
+    color: #08785f;
+    letter-spacing: -1px;
+}
+
+.brand-text p {
+    font-size: 18px;
+    color: #5b6670;
+    margin: 4px 0 0 2px;
+}
+
+.login-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.sidebar-brand {
+    text-align: center;
+    padding: 10px 0 16px 0;
+}
+
+.sidebar-logo {
+    width: 54px;
+    height: 54px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #ffffff, #d8fff5);
+    color: #08785f;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: 900;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.16);
+    margin-bottom: 8px;
+}
+
+.sidebar-brand-title {
+    font-size: 22px;
+    font-weight: 900;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -373,9 +461,12 @@ div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] p {
 # =========================
 def login_page():
     st.markdown("""
-    <div class="main-title">
-        <h1>MediScope</h1>
-        <p>Smart Hospital Document Intelligence System</p>
+    <div class="brand-wrap">
+        <div class="logo-mark"></div>
+        <div class="brand-text">
+            <h1>MediScope</h1>
+            <p>Smart Hospital Document Intelligence System</p>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -384,6 +475,7 @@ def login_page():
     with center:
         st.markdown("""
         <div class="login-card">
+            <div class="login-logo"><div class="logo-mark" style="width:64px;height:64px;border-radius:22px;"></div></div>
             <div class="login-title">Login</div>
             <div class="login-subtitle">Enter your username and password to access the system</div>
         """, unsafe_allow_html=True)
@@ -415,16 +507,24 @@ if not st.session_state.logged_in:
 # Header
 # =========================
 st.markdown("""
-<div class="main-title">
-    <h1>MediScope</h1>
-    <p>Smart Hospital Document Intelligence System</p>
+<div class="brand-wrap">
+    <div class="logo-mark"></div>
+    <div class="brand-text">
+        <h1>MediScope</h1>
+        <p>Smart Hospital Document Intelligence System</p>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
 with st.sidebar:
     st.markdown("---")
-    st.markdown("## 🏥 MediScope")
-    st.markdown("Document Intelligence GUI")
+    st.markdown("""
+    <div class="sidebar-brand">
+        <div class="sidebar-logo">✚</div>
+        <div class="sidebar-brand-title">MediScope</div>
+        <div>Document Intelligence GUI</div>
+    </div>
+    """, unsafe_allow_html=True)
     if st.button("Logout"):
         st.session_state.logged_in = False
         st.rerun()
@@ -535,7 +635,7 @@ home_tab, retrieval_tab, classification_tab, clustering_tab = st.tabs(
 with home_tab:
     st.markdown("""
     <div class="hero-card">
-        <h2>Welcome to MediScope</h2>
+        <h2>🔬 Welcome to MediScope</h2>
         <p>
             A professional hospital document intelligence system for semantic retrieval,
             recommendation classification, and document clustering using NLP and machine learning.
