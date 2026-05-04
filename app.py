@@ -542,6 +542,104 @@ div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] p {
     50% { transform: scale(1.06); box-shadow: 0 14px 34px rgba(0,0,0,0.24); }
 }
 
+
+/* ===== CREATIVE MEDISCOPE LOGO - SHIELD + DOC + HEARTBEAT + SEARCH ===== */
+.logo-mark {
+    width: 122px !important;
+    height: 122px !important;
+    margin: 0 auto 16px auto !important;
+    border-radius: 34px !important;
+    background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,0.34), transparent 28%),
+        linear-gradient(135deg, #064f46 0%, #08a87f 45%, #22e6b6 100%) !important;
+    position: relative !important;
+    box-shadow:
+        0 24px 55px rgba(8, 120, 95, 0.36),
+        inset 0 1px 0 rgba(255,255,255,0.38) !important;
+    animation: floatLogo 3.2s ease-in-out infinite, glowPulse 2.4s ease-in-out infinite !important;
+    overflow: visible !important;
+}
+
+/* remove old microscope emoji */
+.logo-mark::before {
+    content: "" !important;
+    position: absolute !important;
+    width: 58px !important;
+    height: 72px !important;
+    left: 29px !important;
+    top: 22px !important;
+    background: rgba(255,255,255,0.96) !important;
+    border-radius: 16px 16px 20px 20px !important;
+    clip-path: polygon(50% 0%, 100% 18%, 92% 72%, 50% 100%, 8% 72%, 0% 18%) !important;
+    box-shadow: 0 12px 22px rgba(0,0,0,0.16) !important;
+    animation: iconPulse 2.2s ease-in-out infinite !important;
+}
+
+/* search lens ring */
+.logo-mark::after {
+    content: "" !important;
+    position: absolute !important;
+    width: 42px !important;
+    height: 42px !important;
+    right: 20px !important;
+    bottom: 22px !important;
+    border: 8px solid rgba(255,255,255,0.92) !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    box-shadow: 0 10px 18px rgba(0,0,0,0.18) !important;
+    z-index: 3 !important;
+    animation: lensMove 3.2s ease-in-out infinite !important;
+}
+
+/* heartbeat line inside logo */
+.logo-mark .pulse-line {
+    display: none;
+}
+
+.brand-wrap::after {
+    content: "⌁";
+    position: absolute;
+    left: calc(50% - 42px);
+    top: 68px;
+    font-size: 56px;
+    color: #08785f;
+    z-index: 8;
+    font-weight: 900;
+    transform: rotate(0deg);
+    opacity: 0.95;
+    animation: heartbeat 1.8s ease-in-out infinite;
+}
+
+/* magnifier handle */
+.brand-wrap::before {
+    content: "";
+    position: absolute;
+    left: calc(50% + 46px);
+    top: 116px;
+    width: 34px;
+    height: 9px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.92);
+    transform: rotate(45deg);
+    z-index: 8;
+    box-shadow: 0 8px 14px rgba(0,0,0,0.16);
+}
+
+.brand-wrap {
+    position: relative !important;
+}
+
+@keyframes lensMove {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-4px, -3px) scale(1.04); }
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); opacity: 0.92; }
+    35% { transform: scale(1.12); opacity: 1; }
+    55% { transform: scale(0.98); opacity: 0.95; }
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -565,7 +663,6 @@ def login_page():
     with center:
         st.markdown("""
         <div class="login-card">
-            <div class="login-logo"><div class="logo-mark" style="width:64px;height:64px;border-radius:22px;"></div></div>
             <div class="login-title">Login</div>
             <div class="login-subtitle">Enter your username and password to access the system</div>
         """, unsafe_allow_html=True)
