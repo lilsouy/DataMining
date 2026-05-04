@@ -452,6 +452,96 @@ div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] p {
     font-weight: 900;
 }
 
+
+/* ===== ANIMATED MEDISCOPE LOGO - FINAL ===== */
+.brand-wrap {
+    display: block !important;
+    text-align: center !important;
+    padding: 28px 16px 12px 16px !important;
+}
+
+.logo-mark {
+    width: 112px !important;
+    height: 112px !important;
+    margin: 0 auto 14px auto !important;
+    border-radius: 32px !important;
+    background: linear-gradient(135deg, #08785f, #00d4a4, #38d9ad) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 20px 45px rgba(8, 120, 95, 0.35) !important;
+    position: relative !important;
+    animation: floatLogo 3.2s ease-in-out infinite, glowPulse 2.4s ease-in-out infinite !important;
+    overflow: visible !important;
+}
+
+.logo-mark::before {
+    content: "🔬" !important;
+    position: static !important;
+    color: white !important;
+    font-size: 48px !important;
+    font-weight: 900 !important;
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25)) !important;
+    animation: iconPulse 2.2s ease-in-out infinite !important;
+}
+
+.logo-mark::after {
+    content: "" !important;
+    position: absolute !important;
+    width: 150px !important;
+    height: 150px !important;
+    border-radius: 42px !important;
+    background: radial-gradient(circle, rgba(0, 212, 164, 0.35), transparent 68%) !important;
+    z-index: -1 !important;
+    animation: auraPulse 2.4s ease-in-out infinite !important;
+}
+
+.brand-text h1 {
+    font-size: 64px !important;
+    font-weight: 900 !important;
+    margin: 0 !important;
+    letter-spacing: -1.5px !important;
+    background: linear-gradient(90deg, #08785f, #00c9a7, #38d9ad) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+.brand-text p {
+    font-size: 18px !important;
+    color: #5b6670 !important;
+    margin-top: 6px !important;
+}
+
+.sidebar-logo {
+    animation: smallPulse 2.5s ease-in-out infinite !important;
+}
+
+@keyframes floatLogo {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(-1deg); }
+}
+
+@keyframes glowPulse {
+    0%, 100% { box-shadow: 0 20px 45px rgba(8, 120, 95, 0.30); }
+    50% { box-shadow: 0 25px 60px rgba(0, 212, 164, 0.55); }
+}
+
+@keyframes auraPulse {
+    0%, 100% { transform: scale(0.92); opacity: 0.55; }
+    50% { transform: scale(1.18); opacity: 0.95; }
+}
+
+@keyframes iconPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+}
+
+@keyframes smallPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 10px 24px rgba(0,0,0,0.16); }
+    50% { transform: scale(1.06); box-shadow: 0 14px 34px rgba(0,0,0,0.24); }
+}
+
 </style>
 """, unsafe_allow_html=True)
 
