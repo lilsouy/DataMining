@@ -1,8 +1,7 @@
-
 import os
 import zipfile
 import tempfile
-import base64
+import urllib.parse
 
 import streamlit as st
 import pandas as pd
@@ -37,10 +36,10 @@ st.set_page_config(
 
 
 # =========================
-# SVG Logo
+# Logo SVG as Image
 # =========================
-LOGO_SVG = r"""
-<svg class="mediscope-svg-logo" viewBox="0 0 620 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MediScope logo">
+LOGO_SVG = """
+<svg viewBox="0 0 620 190" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="shieldGrad" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#79d894"/>
@@ -71,9 +70,7 @@ LOGO_SVG = r"""
     </filter>
   </defs>
 
-  <!-- icon group -->
   <g transform="translate(15,18)" filter="url(#softGlow)">
-    <!-- outer shield -->
     <path d="M82 5
              C104 19 126 24 151 28
              C156 29 160 34 160 40
@@ -85,43 +82,36 @@ LOGO_SVG = r"""
              C38 24 60 19 82 5Z"
           fill="url(#shieldGrad)" stroke="#eafff8" stroke-width="3"/>
 
-    <!-- lower dark sweep -->
     <path d="M16 118
              C52 142 105 138 148 101
              C139 132 111 154 82 166
              C52 154 29 138 16 118Z"
           fill="url(#shieldDeep)" opacity="0.92"/>
 
-    <!-- left chart bars -->
     <g fill="#f7fffb" opacity="0.96">
       <rect x="29" y="80" width="10" height="38" rx="3"/>
       <rect x="45" y="66" width="10" height="52" rx="3"/>
       <rect x="61" y="92" width="10" height="26" rx="3"/>
     </g>
 
-    <!-- medical cross -->
     <g fill="#f7fffb" opacity="0.98">
       <rect x="70" y="38" width="16" height="48" rx="7"/>
       <rect x="54" y="54" width="48" height="16" rx="7"/>
     </g>
 
-    <!-- magnifier circle -->
     <circle cx="90" cy="88" r="38" fill="#eafff8" opacity="0.94"/>
     <circle cx="90" cy="88" r="27" fill="none" stroke="#089277" stroke-width="9"/>
     <circle cx="90" cy="88" r="35" fill="none" stroke="#ffffff" stroke-width="5"/>
 
-    <!-- magnifier handle -->
     <line x1="118" y1="116" x2="150" y2="148"
           stroke="#eafff8" stroke-width="14" stroke-linecap="round"/>
     <line x1="118" y1="116" x2="150" y2="148"
           stroke="#067463" stroke-width="7" stroke-linecap="round"/>
 
-    <!-- white outline accent -->
     <path d="M24 42 C45 38 64 32 82 21 C101 32 120 38 141 42"
           fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
   </g>
 
-  <!-- text -->
   <g transform="translate(205,55)" filter="url(#textShadow)">
     <text x="0" y="55"
           font-family="Inter, Segoe UI, Arial, sans-serif"
@@ -148,6 +138,8 @@ LOGO_SVG = r"""
 </svg>
 """
 
+LOGO_URI = "data:image/svg+xml;utf8," + urllib.parse.quote(LOGO_SVG)
+
 
 # =========================
 # Session State
@@ -164,8 +156,8 @@ if "theme" not in st.session_state:
 # =========================
 top_left, top_right = st.columns([5, 1])
 with top_right:
-    dark_on = st.toggle("🌙 Dark Mode", value=(st.session_state.theme == "Dark"))
-    st.session_state.theme = "Dark" if dark_on else "Light"
+    dark_mode = st.toggle("🌙 Dark Mode", value=(st.session_state.theme == "Dark"))
+    st.session_state.theme = "Dark" if dark_mode else "Light"
 
 
 # =========================
@@ -179,7 +171,7 @@ if st.session_state.theme == "Dark":
     accent = "#38d9ad"
     tab_bg = "rgba(255,255,255,0.08)"
     metric_bg = "rgba(15, 35, 32, 0.90)"
-    bg_opacity = "0.055"
+    watermark_opacity = "0.045"
 else:
     app_background = "linear-gradient(135deg, #eef7f5 0%, #f8fbff 45%, #ffffff 100%)"
     card_background = "rgba(255, 255, 255, 0.92)"
@@ -188,7 +180,7 @@ else:
     accent = "#08785f"
     tab_bg = "rgba(255,255,255,0.76)"
     metric_bg = "rgba(255,255,255,0.76)"
-    bg_opacity = "0.055"
+    watermark_opacity = "0.055"
 
 
 st.markdown(f"""
@@ -204,19 +196,17 @@ html, body, [class*="css"] {{
     color: {text_main};
 }}
 
-/* Logo as soft background watermark */
 .stApp::before {{
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    background-image: none;
+    background-image: url("{LOGO_URI}");
     background-repeat: no-repeat;
     background-position: center 330px;
-    background-size: 760px;
-    opacity: {bg_opacity};
-    filter: blur(0.2px);
+    background-size: 820px;
+    opacity: {watermark_opacity};
 }}
 
 .block-container {{
@@ -234,52 +224,23 @@ html, body, [class*="css"] {{
 
 .logo-header {{
     text-align: center;
-    padding: 28px 0 18px 0;
+    padding: 26px 0 18px 0;
 }}
 
-.logo-header img {{ display:none; }}
-
-.logo-watermark {{
-    position: fixed;
-    left: 50%;
-    top: 54%;
-    transform: translate(-50%, -50%);
-    width: 820px;
-    max-width: 90vw;
-    opacity: 0.045;
-    z-index: 0;
-    pointer-events: none;
-}}
-.logo-watermark svg {{
-    width: 100%;
-    height: auto;
-}}
-.logo-header svg {{
+.logo-header img {{
     width: 420px;
     max-width: 88%;
     height: auto;
     filter: drop-shadow(0 18px 35px rgba(8,120,95,0.28));
 }}
-.sidebar-logo-img svg {{
+
+.sidebar-logo-img {{
     width: 165px;
     max-width: 88%;
     height: auto;
-    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.18));
-}}
-
-.logo-header img {{
-    width: 390px;
-    max-width: 85%;
-    border-radius: 18px;
-    filter: drop-shadow(0 18px 35px rgba(8,120,95,0.20));
-}}
-
-.sidebar-logo-img {{
-    width: 150px;
-    max-width: 85%;
-    border-radius: 14px;
-    margin: 6px auto 10px auto;
     display: block;
+    margin: 8px auto 10px auto;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.18));
 }}
 
 .login-card, .section-card, .feature-card, .hero-card {{
@@ -385,7 +346,6 @@ label, .stTextInput label, .stSlider label {{
     font-weight: 800 !important;
 }}
 
-/* centered tabs */
 div[data-testid="stTabs"] div[role="tablist"] {{
     justify-content: center !important;
     gap: 18px !important;
@@ -459,22 +419,18 @@ hr {{
 """, unsafe_allow_html=True)
 
 
-
-st.markdown(f"""
-<div class="logo-watermark">
-    {LOGO_SVG}
-</div>
-""", unsafe_allow_html=True)
-
 # =========================
 # Reusable Header
 # =========================
 def render_header():
-    st.markdown(f"""
-    <div class="logo-header">
-        {LOGO_SVG}
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        f"""
+        <div class="logo-header">
+            <img src="{LOGO_URI}" alt="MediScope Logo">
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 
 # =========================
@@ -486,11 +442,14 @@ def login_page():
     left, center, right = st.columns([1, 1.15, 1])
 
     with center:
-        st.markdown("""
-        <div class="login-card">
-            <div class="login-title">Login</div>
-            <div class="login-subtitle">Enter your username and password to access the system</div>
-        """, unsafe_allow_html=True)
+        st.markdown(
+            """
+            <div class="login-card">
+                <div class="login-title">Login</div>
+                <div class="login-subtitle">Enter your username and password to access the system</div>
+            """,
+            unsafe_allow_html=True
+        )
 
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
@@ -521,13 +480,16 @@ with st.sidebar:
     st.markdown("## ⚙️ Settings")
     st.write("Use the switch at the top-right to change theme.")
     st.markdown("---")
-    st.markdown(f"""
-    <div class="sidebar-brand">
-        <div class="sidebar-logo-img">{LOGO_SVG}</div>
-        <div class="sidebar-brand-title">MediScope</div>
-        <div>Document Intelligence GUI</div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        f"""
+        <div class="sidebar-brand">
+            <img src="{LOGO_URI}" class="sidebar-logo-img" alt="MediScope Logo">
+            <div class="sidebar-brand-title">MediScope</div>
+            <div>Document Intelligence GUI</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     if st.button("Logout"):
         st.session_state.logged_in = False
@@ -643,15 +605,18 @@ home_tab, retrieval_tab, classification_tab, clustering_tab = st.tabs(
 # Home
 # =========================
 with home_tab:
-    st.markdown("""
-    <div class="hero-card">
-        <h2>Welcome to MediScope</h2>
-        <p>
-            A professional hospital document intelligence system for semantic retrieval,
-            recommendation classification, and document clustering using NLP and machine learning.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="hero-card">
+            <h2>Welcome to MediScope</h2>
+            <p>
+                A professional hospital document intelligence system for semantic retrieval,
+                recommendation classification, and document clustering using NLP and machine learning.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     m1, m2, m3 = st.columns(3)
     m1.metric("📄 Total Documents", len(Data))
@@ -663,28 +628,37 @@ with home_tab:
     c1, c2, c3 = st.columns(3)
 
     with c1:
-        st.markdown("""
-        <div class="feature-card">
-            <h3>🔍 Retrieve</h3>
-            <p>Enter a query and retrieve the most similar hospital documents using TF-IDF and cosine similarity.</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(
+            """
+            <div class="feature-card">
+                <h3>🔍 Retrieve</h3>
+                <p>Enter a query and retrieve the most similar hospital documents using TF-IDF and cosine similarity.</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     with c2:
-        st.markdown("""
-        <div class="feature-card">
-            <h3>🧠 Classify</h3>
-            <p>Classify documents into recommendation labels using Naive Bayes and Decision Tree models.</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(
+            """
+            <div class="feature-card">
+                <h3>🧠 Classify</h3>
+                <p>Classify documents into recommendation labels using Naive Bayes and Decision Tree models.</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     with c3:
-        st.markdown("""
-        <div class="feature-card">
-            <h3>📊 Cluster</h3>
-            <p>Group documents automatically into clusters using K-Means clustering.</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(
+            """
+            <div class="feature-card">
+                <h3>📊 Cluster</h3>
+                <p>Group documents automatically into clusters using K-Means clustering.</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     st.markdown("<br>", unsafe_allow_html=True)
 
