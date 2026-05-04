@@ -237,9 +237,9 @@ html, body, [class*="css"] {{
     padding: 28px 0 18px 0;
 }}
 
-.logo-header img { display:none; }
+.logo-header img {{ display:none; }}
 
-.logo-watermark {
+.logo-watermark {{
     position: fixed;
     left: 50%;
     top: 54%;
@@ -249,23 +249,23 @@ html, body, [class*="css"] {{
     opacity: 0.045;
     z-index: 0;
     pointer-events: none;
-}
-.logo-watermark svg {
+}}
+.logo-watermark svg {{
     width: 100%;
     height: auto;
-}
-.logo-header svg {
+}}
+.logo-header svg {{
     width: 420px;
     max-width: 88%;
     height: auto;
     filter: drop-shadow(0 18px 35px rgba(8,120,95,0.28));
-}
-.sidebar-logo-img svg {
+}}
+.sidebar-logo-img svg {{
     width: 165px;
     max-width: 88%;
     height: auto;
     filter: drop-shadow(0 8px 16px rgba(0,0,0,0.18));
-}
+}}
 
 .logo-header img {{
     width: 390px;
