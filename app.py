@@ -29,7 +29,7 @@ from sklearn.cluster import KMeans
 # =========================
 st.set_page_config(
     page_title="MediScope",
-    page_icon="🔬",
+    page_icon="🔍",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -46,611 +46,343 @@ if "theme" not in st.session_state:
 
 
 # =========================
+# SVG Logo
+# =========================
+LOGO_SVG = """
+<svg width="78" height="78" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="mediscopeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#08785f"/>
+            <stop offset="100%" stop-color="#00d4a4"/>
+        </linearGradient>
+    </defs>
+
+    <rect x="5" y="5" width="90" height="90" rx="24" fill="url(#mediscopeGrad)"/>
+
+    <!-- document -->
+    <rect x="27" y="20" width="35" height="48" rx="7" fill="white" opacity="0.96"/>
+    <line x1="34" y1="32" x2="55" y2="32" stroke="#08785f" stroke-width="3" stroke-linecap="round"/>
+    <line x1="34" y1="40" x2="55" y2="40" stroke="#08785f" stroke-width="3" stroke-linecap="round"/>
+    <line x1="34" y1="48" x2="49" y2="48" stroke="#08785f" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- magnifier -->
+    <circle cx="62" cy="62" r="12" stroke="white" stroke-width="5" fill="none"/>
+    <line x1="71" y1="71" x2="80" y2="80" stroke="white" stroke-width="5" stroke-linecap="round"/>
+</svg>
+"""
+
+SMALL_LOGO_SVG = LOGO_SVG.replace('width="78" height="78"', 'width="52" height="52"')
+
+
+# =========================
 # Theme Toggle
 # =========================
 top_left, top_right = st.columns([5, 1])
 with top_right:
-    st.session_state.theme = st.toggle("🌙 Dark Mode", value=(st.session_state.theme == "Dark"))
-    st.session_state.theme = "Dark" if st.session_state.theme else "Light"
-
-with st.sidebar:
-    st.markdown("## ⚙️ Settings")
-    st.write("Use the switch at the top-right to change theme.")
+    dark_on = st.toggle("🌙 Dark Mode", value=(st.session_state.theme == "Dark"))
+    st.session_state.theme = "Dark" if dark_on else "Light"
 
 
 # =========================
-# CSS Themes
+# CSS
 # =========================
 if st.session_state.theme == "Dark":
-    css = """
-    <style>
-    .stApp {
-        background: linear-gradient(135deg, #071f1b 0%, #0b2b25 45%, #101418 100%);
-        color: #f5f7f7;
-    }
-
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #06251f 0%, #0b5c4a 100%);
-    }
-
-    [data-testid="stSidebar"] * {
-        color: white !important;
-    }
-
-    .main-title h1, .section-title, .feature-card h3 {
-        color: #38d9ad !important;
-    }
-
-    .main-title p, .small-muted, .feature-card p, .hero-card p {
-        color: #d0d8d6 !important;
-    }
-
-    .hero-card, .feature-card, .section-card, .login-card {
-        background: rgba(15, 35, 32, 0.96);
-        border: 1px solid rgba(70, 220, 180, 0.18);
-        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
-        color: #f5f7f7;
-    }
-
-    div.stButton > button {
-        background: linear-gradient(90deg, #0e8d71, #28c99c);
-        color: white;
-        border: none;
-        border-radius: 999px;
-        padding: 0.7rem 1.5rem;
-        font-weight: 700;
-    }
-
-    [data-testid="stMetricValue"] {
-        color: #38d9ad;
-    }
-    
-/* ===== DARK MODE VISIBILITY ===== */
-div[data-testid="stTabs"] button, div[data-testid="stTabs"] button p {
-    color: #d8fff5 !important;
-    font-weight: 800 !important;
-    opacity: 1 !important;
-}
-div[data-testid="stTabs"] [aria-selected="true"], div[data-testid="stTabs"] [aria-selected="true"] p {
-    color: #38d9ad !important;
-}
-[data-testid="stMetricLabel"] {
-    color: #d8fff5 !important;
-    font-weight: 800 !important;
-    opacity: 1 !important;
-}
-[data-testid="stMetricValue"] {
-    color: #38d9ad !important;
-}
-label, .stRadio label, .stTextInput label, .stSlider label {
-    color: #d8fff5 !important;
-    font-weight: 700 !important;
-}
-
-    </style>
-    """
+    app_background = "linear-gradient(135deg, #071f1b 0%, #0b2b25 45%, #101418 100%)"
+    card_background = "rgba(15, 35, 32, 0.96)"
+    text_main = "#f5f7f7"
+    text_muted = "#d0d8d6"
+    accent = "#38d9ad"
+    tab_bg = "rgba(255,255,255,0.08)"
+    metric_bg = "rgba(15, 35, 32, 0.90)"
+    bg_logo_opacity = "0.055"
 else:
-    css = """
-    <style>
-    .stApp {
-        background: linear-gradient(135deg, #eef7f5 0%, #f8fbff 45%, #ffffff 100%);
-        color: #1c2529;
-    }
+    app_background = "linear-gradient(135deg, #eef7f5 0%, #f8fbff 45%, #ffffff 100%)"
+    card_background = "rgba(255, 255, 255, 0.92)"
+    text_main = "#1c2529"
+    text_muted = "#5b6670"
+    accent = "#08785f"
+    tab_bg = "rgba(255,255,255,0.76)"
+    metric_bg = "rgba(255,255,255,0.76)"
+    bg_logo_opacity = "0.075"
 
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0b6b57 0%, #0f8f70 100%);
-    }
 
-    [data-testid="stSidebar"] * {
-        color: white !important;
-    }
-
-    .main-title h1, .section-title, .feature-card h3 {
-        color: #08785f !important;
-    }
-
-    .main-title p, .small-muted, .feature-card p, .hero-card p {
-        color: #5b6670 !important;
-    }
-
-    .hero-card {
-        background: linear-gradient(120deg, #d9f3dd, #f5fff7);
-        border: 1px solid #c6e8cf;
-        box-shadow: 0 18px 45px rgba(15, 143, 112, 0.15);
-    }
-
-    .feature-card, .section-card, .login-card {
-        background: white;
-        border: 1px solid #e8eeee;
-        box-shadow: 0 12px 32px rgba(19, 48, 43, 0.08);
-    }
-
-    div.stButton > button {
-        background: linear-gradient(90deg, #08785f, #11a87f);
-        color: white;
-        border: none;
-        border-radius: 999px;
-        padding: 0.7rem 1.5rem;
-        font-weight: 700;
-    }
-
-    [data-testid="stMetricValue"] {
-        color: #08785f;
-    }
-    
-/* ===== FIX VISIBILITY ===== */
-div[data-testid="stTabs"] button {
-    color: #08785f !important;
-    font-weight: 800 !important;
-    opacity: 1 !important;
-}
-div[data-testid="stTabs"] button p {
-    color: #08785f !important;
-    font-weight: 800 !important;
-    opacity: 1 !important;
-}
-div[data-testid="stTabs"] [aria-selected="true"] {
-    color: #ff4b4b !important;
-    border-bottom: 3px solid #ff4b4b !important;
-}
-div[data-testid="stTabs"] [aria-selected="true"] p {
-    color: #ff4b4b !important;
-}
-[data-testid="stMetricLabel"] {
-    color: #08785f !important;
-    font-weight: 800 !important;
-    opacity: 1 !important;
-}
-[data-testid="stMetricValue"] {
-    color: #08785f !important;
-}
-label, .stRadio label, .stTextInput label, .stSlider label {
-    color: #08785f !important;
-    font-weight: 700 !important;
-}
-
-    </style>
-    """
-
-st.markdown(css, unsafe_allow_html=True)
-
-st.markdown("""
+st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
 
-html, body, [class*="css"] {
+html, body, [class*="css"] {{
     font-family: 'Inter', sans-serif;
-}
+}}
 
-.main-title {
-    text-align: center;
-    padding: 28px 16px 10px 16px;
-}
+.stApp {{
+    background: {app_background};
+    color: {text_main};
+}}
 
-.main-title h1 {
-    font-size: 58px;
-    font-weight: 800;
-    margin-bottom: 0;
-}
+/* soft watermark background */
+.stApp::before {{
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+        radial-gradient(circle at 50% 44%, rgba(0, 212, 164, {bg_logo_opacity}) 0%, rgba(0, 212, 164, 0) 34%),
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect x='45' y='35' width='70' height='95' rx='16' fill='%2308785f' opacity='0.08'/><line x1='60' y1='62' x2='102' y2='62' stroke='%2308785f' stroke-width='7' opacity='0.10'/><line x1='60' y1='82' x2='102' y2='82' stroke='%2308785f' stroke-width='7' opacity='0.10'/><circle cx='122' cy='122' r='28' stroke='%2300d4a4' stroke-width='12' fill='none' opacity='0.12'/><line x1='142' y1='142' x2='165' y2='165' stroke='%2300d4a4' stroke-width='12' stroke-linecap='round' opacity='0.12'/></svg>");
+    background-repeat: no-repeat;
+    background-position: center 290px;
+    background-size: 580px;
+}}
 
-.main-title p {
-    font-size: 18px;
-    margin-top: 6px;
-}
+.block-container {{
+    position: relative;
+    z-index: 1;
+}}
 
-.hero-card {
-    border-radius: 28px;
-    padding: 34px;
-    text-align: center;
-    margin-bottom: 22px;
-}
+[data-testid="stSidebar"] {{
+    background: linear-gradient(180deg, #064f46 0%, #0b8a6b 100%);
+}}
 
-.hero-card h2 {
-    color: #08785f;
-    font-size: 34px;
-    font-weight: 800;
-    margin-bottom: 4px;
-}
-
-.feature-card {
-    border-radius: 22px;
-    padding: 24px;
-    min-height: 190px;
-    transition: all 0.2s ease;
-}
-
-.feature-card h3 {
-    font-weight: 800;
-    font-size: 22px;
-}
-
-.feature-card p {
-    font-size: 15px;
-    line-height: 1.6;
-}
-
-.section-card, .login-card {
-    border-radius: 24px;
-    padding: 28px;
-    margin-bottom: 22px;
-}
-
-.section-title {
-    font-weight: 800;
-    font-size: 28px;
-    margin-bottom: 8px;
-}
-
-.small-muted {
-    font-size: 15px;
-}
-
-.login-title {
-    text-align: center;
-    font-size: 42px;
-    font-weight: 800;
-    color: #08785f;
-}
-
-.login-subtitle {
-    text-align: center;
-    color: #6a777d;
-    margin-bottom: 25px;
-}
-
-div.stButton > button:hover {
-    filter: brightness(0.95);
-    color: white;
-}
-
-hr {
-    border: none;
-    height: 1px;
-    background: #d7ebe5;
-    margin: 20px 0;
-}
-
-/* ===== PROFESSIONAL CENTERED TABS ===== */
-div[data-testid="stTabs"] {
-    width: 100%;
-}
-
-div[data-testid="stTabs"] div[role="tablist"] {
-    justify-content: center !important;
-    gap: 18px !important;
-    border-bottom: 1px solid rgba(8, 120, 95, 0.18);
-    padding-bottom: 12px;
-}
-
-div[data-testid="stTabs"] button[role="tab"] {
-    border-radius: 999px !important;
-    padding: 10px 22px !important;
-    min-width: 150px;
-    background: rgba(255, 255, 255, 0.10) !important;
-    border: 1px solid rgba(8, 120, 95, 0.18) !important;
-}
-
-div[data-testid="stTabs"] button[role="tab"] p {
-    font-size: 16px !important;
-    font-weight: 800 !important;
-    margin: 0 !important;
-}
-
-div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
-    background: linear-gradient(90deg, #08785f, #12b98d) !important;
-    border: 1px solid transparent !important;
-    box-shadow: 0 10px 24px rgba(8, 120, 95, 0.25);
-}
-
-div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] p {
+[data-testid="stSidebar"] * {{
     color: white !important;
-}
+}}
 
-/* ===== DASHBOARD METRIC CARDS ===== */
-[data-testid="stMetric"] {
-    background: rgba(255, 255, 255, 0.72);
-    border: 1px solid rgba(8, 120, 95, 0.13);
-    border-radius: 22px;
-    padding: 22px 24px;
-    box-shadow: 0 12px 28px rgba(19, 48, 43, 0.08);
-}
-
-[data-testid="stMetricLabel"] {
-    font-size: 16px !important;
-}
-
-[data-testid="stMetricValue"] {
-    font-size: 34px !important;
-    font-weight: 900 !important;
-}
-
-
-/* ===== MEDISCOPE LOGO ===== */
-.brand-wrap {
+.brand-header {{
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 18px;
-    padding: 24px 16px 8px 16px;
-}
+    padding: 24px 16px 18px 16px;
+}}
 
-.logo-mark {
-    width: 82px;
-    height: 82px;
-    border-radius: 26px;
-    background: linear-gradient(135deg, #08785f, #13c99a);
+.logo-box {{
+    width: 88px;
+    height: 88px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 18px 38px rgba(8, 120, 95, 0.28);
-    position: relative;
-}
+    border-radius: 28px;
+    box-shadow: 0 22px 50px rgba(8, 120, 95, 0.28);
+    animation: logoFloat 3.8s ease-in-out infinite;
+}}
 
-.logo-mark::before {
-    content: "✚";
-    color: white;
-    font-size: 34px;
-    font-weight: 900;
-    position: absolute;
-    top: 14px;
-    left: 18px;
-}
-
-.logo-mark::after {
-    content: "⌕";
-    color: rgba(255,255,255,0.92);
-    font-size: 42px;
-    font-weight: 900;
-    position: absolute;
-    right: 12px;
-    bottom: 5px;
-    transform: rotate(-12deg);
-}
-
-.brand-text h1 {
-    font-size: 58px;
+.brand-text h1 {{
+    font-size: 62px;
     font-weight: 900;
     margin: 0;
-    color: #08785f;
-    letter-spacing: -1px;
-}
+    letter-spacing: -1.5px;
+    background: linear-gradient(90deg, #08785f, #00c9a7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}}
 
-.brand-text p {
+.brand-text p {{
+    margin: 2px 0 0 3px;
     font-size: 18px;
-    color: #5b6670;
-    margin: 4px 0 0 2px;
-}
+    color: {text_muted};
+}}
 
-.login-logo {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 12px;
-}
+@keyframes logoFloat {{
+    0%, 100% {{ transform: translateY(0); }}
+    50% {{ transform: translateY(-6px); }}
+}}
 
-.sidebar-brand {
+.login-card, .section-card, .feature-card, .hero-card {{
+    background: {card_background};
+    border: 1px solid rgba(8, 120, 95, 0.15);
+    box-shadow: 0 18px 42px rgba(19, 48, 43, 0.09);
+    border-radius: 28px;
+}}
+
+.login-card {{
+    padding: 34px;
+    margin-top: 10px;
+}}
+
+.login-title {{
+    text-align: center;
+    font-size: 42px;
+    font-weight: 900;
+    color: {accent};
+}}
+
+.login-subtitle {{
+    text-align: center;
+    color: {text_muted};
+    margin-bottom: 24px;
+}}
+
+.hero-card {{
+    padding: 38px;
+    text-align: center;
+    margin-bottom: 26px;
+}}
+
+.hero-card h2 {{
+    color: {accent};
+    font-size: 34px;
+    font-weight: 900;
+    margin-bottom: 8px;
+}}
+
+.hero-card p {{
+    color: {text_muted};
+    font-size: 17px;
+    line-height: 1.7;
+}}
+
+.feature-card {{
+    padding: 26px;
+    min-height: 180px;
+    transition: 0.2s ease;
+}}
+
+.feature-card:hover {{
+    transform: translateY(-4px);
+    box-shadow: 0 22px 50px rgba(8, 120, 95, 0.16);
+}}
+
+.feature-card h3 {{
+    color: {accent};
+    font-size: 23px;
+    font-weight: 900;
+}}
+
+.feature-card p {{
+    color: {text_muted};
+    line-height: 1.6;
+}}
+
+.section-card {{
+    padding: 28px;
+    margin-bottom: 24px;
+}}
+
+.section-title {{
+    color: {accent};
+    font-size: 30px;
+    font-weight: 900;
+    margin-bottom: 8px;
+}}
+
+.small-muted {{
+    color: {text_muted};
+    font-size: 15px;
+}}
+
+div.stButton > button {{
+    background: linear-gradient(90deg, #08785f, #10b98c);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 0.72rem 1.55rem;
+    font-weight: 800;
+    box-shadow: 0 12px 24px rgba(8, 120, 95, 0.22);
+}}
+
+div.stButton > button:hover {{
+    background: linear-gradient(90deg, #076b55, #0e906d);
+    color: white;
+}}
+
+label, .stTextInput label, .stSlider label {{
+    color: {accent} !important;
+    font-weight: 800 !important;
+}}
+
+/* centered professional tabs */
+div[data-testid="stTabs"] div[role="tablist"] {{
+    justify-content: center !important;
+    gap: 18px !important;
+    border-bottom: 1px solid rgba(8, 120, 95, 0.18);
+    padding-bottom: 12px;
+}}
+
+div[data-testid="stTabs"] button[role="tab"] {{
+    border-radius: 999px !important;
+    padding: 10px 22px !important;
+    min-width: 155px;
+    background: {tab_bg} !important;
+    border: 1px solid rgba(8, 120, 95, 0.18) !important;
+}}
+
+div[data-testid="stTabs"] button[role="tab"] p {{
+    color: {accent} !important;
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    margin: 0 !important;
+}}
+
+div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {{
+    background: linear-gradient(90deg, #08785f, #12b98d) !important;
+    border: 1px solid transparent !important;
+    box-shadow: 0 10px 24px rgba(8, 120, 95, 0.25);
+}}
+
+div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] p {{
+    color: white !important;
+}}
+
+[data-testid="stMetric"] {{
+    background: {metric_bg};
+    border: 1px solid rgba(8, 120, 95, 0.13);
+    border-radius: 22px;
+    padding: 22px 24px;
+    box-shadow: 0 12px 28px rgba(19, 48, 43, 0.08);
+}}
+
+[data-testid="stMetricLabel"] {{
+    color: {accent} !important;
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    opacity: 1 !important;
+}}
+
+[data-testid="stMetricValue"] {{
+    color: {accent} !important;
+    font-size: 34px !important;
+    font-weight: 900 !important;
+}}
+
+.sidebar-brand {{
     text-align: center;
     padding: 10px 0 16px 0;
-}
+}}
 
-.sidebar-logo {
-    width: 54px;
-    height: 54px;
-    border-radius: 18px;
-    background: linear-gradient(135deg, #ffffff, #d8fff5);
-    color: #08785f;
+.sidebar-logo {{
+    width: 58px;
+    height: 58px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 26px;
-    font-weight: 900;
-    box-shadow: 0 10px 24px rgba(0,0,0,0.16);
+    background: rgba(255,255,255,0.95);
+    border-radius: 18px;
     margin-bottom: 8px;
-}
+    box-shadow: 0 10px 24px rgba(0,0,0,0.16);
+}}
 
-.sidebar-brand-title {
+.sidebar-brand-title {{
     font-size: 22px;
     font-weight: 900;
-}
+}}
 
-
-/* ===== ANIMATED MEDISCOPE LOGO - FINAL ===== */
-.brand-wrap {
-    display: block !important;
-    text-align: center !important;
-    padding: 28px 16px 12px 16px !important;
-}
-
-.logo-mark {
-    width: 112px !important;
-    height: 112px !important;
-    margin: 0 auto 14px auto !important;
-    border-radius: 32px !important;
-    background: linear-gradient(135deg, #08785f, #00d4a4, #38d9ad) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-shadow: 0 20px 45px rgba(8, 120, 95, 0.35) !important;
-    position: relative !important;
-    animation: floatLogo 3.2s ease-in-out infinite, glowPulse 2.4s ease-in-out infinite !important;
-    overflow: visible !important;
-}
-
-.logo-mark::before {
-    content: "🔬" !important;
-    position: static !important;
-    color: white !important;
-    font-size: 48px !important;
-    font-weight: 900 !important;
-    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25)) !important;
-    animation: iconPulse 2.2s ease-in-out infinite !important;
-}
-
-.logo-mark::after {
-    content: "" !important;
-    position: absolute !important;
-    width: 150px !important;
-    height: 150px !important;
-    border-radius: 42px !important;
-    background: radial-gradient(circle, rgba(0, 212, 164, 0.35), transparent 68%) !important;
-    z-index: -1 !important;
-    animation: auraPulse 2.4s ease-in-out infinite !important;
-}
-
-.brand-text h1 {
-    font-size: 64px !important;
-    font-weight: 900 !important;
-    margin: 0 !important;
-    letter-spacing: -1.5px !important;
-    background: linear-gradient(90deg, #08785f, #00c9a7, #38d9ad) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    background-clip: text !important;
-}
-
-.brand-text p {
-    font-size: 18px !important;
-    color: #5b6670 !important;
-    margin-top: 6px !important;
-}
-
-.sidebar-logo {
-    animation: smallPulse 2.5s ease-in-out infinite !important;
-}
-
-@keyframes floatLogo {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-8px) rotate(-1deg); }
-}
-
-@keyframes glowPulse {
-    0%, 100% { box-shadow: 0 20px 45px rgba(8, 120, 95, 0.30); }
-    50% { box-shadow: 0 25px 60px rgba(0, 212, 164, 0.55); }
-}
-
-@keyframes auraPulse {
-    0%, 100% { transform: scale(0.92); opacity: 0.55; }
-    50% { transform: scale(1.18); opacity: 0.95; }
-}
-
-@keyframes iconPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.12); }
-}
-
-@keyframes smallPulse {
-    0%, 100% { transform: scale(1); box-shadow: 0 10px 24px rgba(0,0,0,0.16); }
-    50% { transform: scale(1.06); box-shadow: 0 14px 34px rgba(0,0,0,0.24); }
-}
-
-
-/* ===== CREATIVE MEDISCOPE LOGO - SHIELD + DOC + HEARTBEAT + SEARCH ===== */
-.logo-mark {
-    width: 122px !important;
-    height: 122px !important;
-    margin: 0 auto 16px auto !important;
-    border-radius: 34px !important;
-    background:
-        radial-gradient(circle at 30% 25%, rgba(255,255,255,0.34), transparent 28%),
-        linear-gradient(135deg, #064f46 0%, #08a87f 45%, #22e6b6 100%) !important;
-    position: relative !important;
-    box-shadow:
-        0 24px 55px rgba(8, 120, 95, 0.36),
-        inset 0 1px 0 rgba(255,255,255,0.38) !important;
-    animation: floatLogo 3.2s ease-in-out infinite, glowPulse 2.4s ease-in-out infinite !important;
-    overflow: visible !important;
-}
-
-/* remove old microscope emoji */
-.logo-mark::before {
-    content: "" !important;
-    position: absolute !important;
-    width: 58px !important;
-    height: 72px !important;
-    left: 29px !important;
-    top: 22px !important;
-    background: rgba(255,255,255,0.96) !important;
-    border-radius: 16px 16px 20px 20px !important;
-    clip-path: polygon(50% 0%, 100% 18%, 92% 72%, 50% 100%, 8% 72%, 0% 18%) !important;
-    box-shadow: 0 12px 22px rgba(0,0,0,0.16) !important;
-    animation: iconPulse 2.2s ease-in-out infinite !important;
-}
-
-/* search lens ring */
-.logo-mark::after {
-    content: "" !important;
-    position: absolute !important;
-    width: 42px !important;
-    height: 42px !important;
-    right: 20px !important;
-    bottom: 22px !important;
-    border: 8px solid rgba(255,255,255,0.92) !important;
-    border-radius: 50% !important;
-    background: transparent !important;
-    box-shadow: 0 10px 18px rgba(0,0,0,0.18) !important;
-    z-index: 3 !important;
-    animation: lensMove 3.2s ease-in-out infinite !important;
-}
-
-/* heartbeat line inside logo */
-.logo-mark .pulse-line {
-    display: none;
-}
-
-.brand-wrap::after {
-    content: "⌁";
-    position: absolute;
-    left: calc(50% - 42px);
-    top: 68px;
-    font-size: 56px;
-    color: #08785f;
-    z-index: 8;
-    font-weight: 900;
-    transform: rotate(0deg);
-    opacity: 0.95;
-    animation: heartbeat 1.8s ease-in-out infinite;
-}
-
-/* magnifier handle */
-.brand-wrap::before {
-    content: "";
-    position: absolute;
-    left: calc(50% + 46px);
-    top: 116px;
-    width: 34px;
-    height: 9px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.92);
-    transform: rotate(45deg);
-    z-index: 8;
-    box-shadow: 0 8px 14px rgba(0,0,0,0.16);
-}
-
-.brand-wrap {
-    position: relative !important;
-}
-
-@keyframes lensMove {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(-4px, -3px) scale(1.04); }
-}
-
-@keyframes heartbeat {
-    0%, 100% { transform: scale(1); opacity: 0.92; }
-    35% { transform: scale(1.12); opacity: 1; }
-    55% { transform: scale(0.98); opacity: 0.95; }
-}
-
+hr {{
+    border: none;
+    height: 1px;
+    background: rgba(8, 120, 95, 0.18);
+    margin: 20px 0;
+}}
 </style>
 """, unsafe_allow_html=True)
 
 
 # =========================
-# Login Page
+# Reusable Header
 # =========================
-def login_page():
-    st.markdown("""
-    <div class="brand-wrap">
-        <div class="logo-mark"></div>
+def render_header():
+    st.markdown(f"""
+    <div class="brand-header">
+        <div class="logo-box">{LOGO_SVG}</div>
         <div class="brand-text">
             <h1>MediScope</h1>
             <p>Smart Hospital Document Intelligence System</p>
@@ -658,7 +390,14 @@ def login_page():
     </div>
     """, unsafe_allow_html=True)
 
-    left, center, right = st.columns([1, 1.2, 1])
+
+# =========================
+# Login Page
+# =========================
+def login_page():
+    render_header()
+
+    left, center, right = st.columns([1, 1.15, 1])
 
     with center:
         st.markdown("""
@@ -669,7 +408,6 @@ def login_page():
 
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
-
         login_clicked = st.button("Login", use_container_width=True)
 
         st.markdown("</div>", unsafe_allow_html=True)
@@ -691,30 +429,29 @@ if not st.session_state.logged_in:
 
 
 # =========================
-# Header
+# Sidebar
 # =========================
-st.markdown("""
-<div class="brand-wrap">
-    <div class="logo-mark"></div>
-    <div class="brand-text">
-        <h1>MediScope</h1>
-        <p>Smart Hospital Document Intelligence System</p>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
 with st.sidebar:
+    st.markdown("## ⚙️ Settings")
+    st.write("Use the switch at the top-right to change theme.")
     st.markdown("---")
-    st.markdown("""
+    st.markdown(f"""
     <div class="sidebar-brand">
-        <div class="sidebar-logo">✚</div>
+        <div class="sidebar-logo">{SMALL_LOGO_SVG}</div>
         <div class="sidebar-brand-title">MediScope</div>
         <div>Document Intelligence GUI</div>
     </div>
     """, unsafe_allow_html=True)
+
     if st.button("Logout"):
         st.session_state.logged_in = False
         st.rerun()
+
+
+# =========================
+# Main Header
+# =========================
+render_header()
 
 
 # =========================
@@ -822,7 +559,7 @@ home_tab, retrieval_tab, classification_tab, clustering_tab = st.tabs(
 with home_tab:
     st.markdown("""
     <div class="hero-card">
-        <h2>🔬 Welcome to MediScope</h2>
+        <h2>Welcome to MediScope</h2>
         <p>
             A professional hospital document intelligence system for semantic retrieval,
             recommendation classification, and document clustering using NLP and machine learning.
